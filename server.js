@@ -10,75 +10,85 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.json({
     message: 'Manlung AI Express Server is running! 🚀',
-    status: 'active'
+    status: 'active',
+    version: '2.0.0'
   });
 });
-// SMARTER CHAT ENDPOINT
-app.post('/chat', (req, res) => {
-  const userMessage = req.body.message.toLowerCase();
-  
-  let response = "";
-  
-  // Smart responses based on user input
-  if (userMessage.includes('hello') || userMessage.includes('hi') || userMessage.includes('hey')) {
-    response = "Hello there! I'm Manlung AI, your friendly assistant. How can I help you today? 😊";
+
+// ENHANCED CHAT API
+app.post('/chat', async (req, res) => {
+  try {
+    const userMessage = req.body.message.toLowerCase();
+    
+    let response = await generateSmartResponse(userMessage);
+    
+    res.json({
+      user_message: req.body.message,
+      ai_response: response,
+      status: 'success',
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    res.status(500).json({ 
+      error: 'AI processing failed',
+      status: 'error'
+    });
   }
-  else if (userMessage.includes('how are you')) {
-    response = "I'm functioning perfectly! Ready to have wonderful conversations and help you with anything you need! 🌟";
-  }
-  else if (userMessage.includes('name')) {
-    response = "I'm Manlung AI! I'm designed to be your helpful, positive companion. What's your name?";
-  }
-  else if (userMessage.includes('song') || userMessage.includes('music')) {
-    response = "I love music! When we connect to music APIs, I'll help you discover amazing songs. What genre do you like? 🎵";
-  }
-  else if (userMessage.includes('weather')) {
-    response = "I don't have weather data yet, but I can tell you it's a great day for positive conversations! ☀️";
-  }
-  else if (userMessage.includes('joke') || userMessage.includes('funny')) {
-    response = "Why don't scientists trust atoms? Because they make up everything! 😄";
-  }
-  else if (userMessage.includes('thank')) {
-    response = "You're very welcome! I'm happy to help. What else would you like to talk about? 💫";
-  }
-  else if (userMessage.includes('bye') || userMessage.includes('goodbye')) {
-    response = "Goodbye! Remember to stay positive and enjoy your day! Come back anytime! 👋";
-  }
-  else if (userMessage.includes('love') || userMessage.includes('like')) {
-    response = "That's wonderful! I'm designed to spread positivity and help people. I appreciate you talking with me! ❤️";
-  }
-  else if (userMessage.includes('help')) {
-    response = "I can chat with you, share positive thoughts, tell jokes, and soon I'll help with music and more! What would you like to do?";
-  }
-  else {
-    // For unknown questions, give varied responses
-    const randomResponses = [
-      "That's interesting! Tell me more about that.",
-      "I'd love to learn more about what you're saying!",
-      "What a great thing to discuss! Could you elaborate?",
-      "I'm still learning, but I find that fascinating!",
-      "Let's explore that topic together! What are your thoughts?"
-    ];
-    response = randomResponses[Math.floor(Math.random() * randomResponses.length)];
-  }
-  
-  res.json({
-    user_message: req.body.message,
-    ai_response: response,
-    status: 'success'
-  });
 });
+
+// SMART RESPONSE GENERATOR
+async function generateSmartResponse(userMessage) {
+  // Tech & AI Questions
+  if (userMessage.includes('ai') || userMessage.includes('artificial intelligence')) {
+    return "Artificial Intelligence is revolutionizing how we interact with technology! I'm built using Node.js and modern AI APIs. I can help you understand AI concepts, build projects, or explore machine learning! 🤖";
+  }
+  
+  if (userMessage.includes('code') || userMessage.includes('programming') || userMessage.includes('javascript')) {
+    return "I love coding! I can help you with programming concepts, debug code, or explain technologies. What specific language or problem are you working on? 💻";
+  }
+  
+  if (userMessage.includes('api') || userMessage.includes('endpoint')) {
+    return "APIs are my specialty! I can help you design RESTful APIs, handle authentication, or integrate with services like music APIs, weather data, or AI models! 🔌";
+  }
+  
+  // Music Search Ready
+  if (userMessage.includes('play') || userMessage.includes('song') || userMessage.includes('music')) {
+    return "I can search for music! While I set up the music API, tell me what genre or artist you like, and I'll help you discover great songs! 🎵";
+  }
+  
+  // Tech Support
+  if (userMessage.includes('error') || userMessage.includes('problem') || userMessage.includes('help')) {
+    return "I can help troubleshoot tech issues! Describe the problem you're facing, and I'll guide you through solutions step by step. 🔧";
+  }
+  
+  // Learning & Education
+  if (userMessage.includes('learn') || userMessage.includes('teach') || userMessage.includes('how to')) {
+    return "I'm here to help you learn! Whether it's technology, programming, AI, or any other topic, I can explain concepts and provide learning resources! 📚";
+  }
+  
+  // Default Smart Responses
+  const smartResponses = [
+    "That's fascinating! I'd love to explore that topic with you. Could you tell me more about what you're thinking?",
+    "I understand what you're saying! From a technical perspective, this relates to several interesting concepts.",
+    "Great question! This touches on some advanced topics I can help explain.",
+    "I appreciate you sharing that! Let me provide some insights based on current technology trends.",
+    "Interesting perspective! Technology is evolving rapidly in that area."
+  ];
+  
+  return smartResponses[Math.floor(Math.random() * smartResponses.length)];
+}
 
 // GET chat endpoint for testing
 app.get('/chat', (req, res) => {
   res.json({
     user_message: "test",
-    ai_response: "Hello! I'm Manlung AI. Chat is working! 🚀",
+    ai_response: "Hello! I'm Manlung AI Enhanced. Chat is working! 🚀",
     status: 'success'
   });
 });
 
-// VOICE ENDPOINT - Add this new section
+// VOICE ENDPOINT
 app.post('/speak', async (req, res) => {
   try {
     const { text } = req.body;
@@ -122,6 +132,104 @@ app.get('/speak', (req, res) => {
   res.json({
     message: 'Send POST request with {"text": "your message"} to generate voice!',
     example: 'Use Postman or curl to test the voice feature'
+  });
+});
+
+// MUSIC SEARCH API
+app.get('/search/music', async (req, res) => {
+  try {
+    const { query, type = 'track' } = req.query;
+    
+    if (!query) {
+      return res.status(400).json({ 
+        error: 'Search query required',
+        example: '/search/music?query=edm&type=track'
+      });
+    }
+    
+    // For now, return mock data - we'll integrate real API later
+    const mockResults = {
+      query: query,
+      type: type,
+      results: [
+        {
+          title: `Top ${query} Track`,
+          artist: "Popular Artist",
+          genre: query,
+          preview: "https://example.com/preview.mp3",
+          description: `This is a popular ${query} track that people love!`
+        },
+        {
+          title: `${query} Hits 2024`,
+          artist: "Various Artists", 
+          genre: query,
+          preview: "https://example.com/preview2.mp3",
+          description: `Latest ${query} music collection`
+        }
+      ],
+      message: "Music API integration ready - add Spotify/YouTube API keys for real search!"
+    };
+    
+    res.json(mockResults);
+    
+  } catch (error) {
+    res.status(500).json({ error: 'Music search failed' });
+  }
+});
+
+// TECH INFO API
+app.get('/tech/info', async (req, res) => {
+  try {
+    const { topic } = req.query;
+    
+    const techInfo = {
+      "ai": {
+        title: "Artificial Intelligence",
+        info: "AI is transforming industries with machine learning, neural networks, and deep learning algorithms.",
+        applications: ["Chatbots", "Image Recognition", "Predictive Analytics"],
+        trending: "GPT models, Computer Vision, AI Ethics"
+      },
+      "blockchain": {
+        title: "Blockchain Technology", 
+        info: "Decentralized ledger technology enabling secure, transparent transactions.",
+        applications: ["Cryptocurrency", "Smart Contracts", "Supply Chain"],
+        trending: "Web3, NFTs, DeFi"
+      },
+      "cloud": {
+        title: "Cloud Computing",
+        info: "On-demand computing services over the internet with scalable resources.",
+        applications: ["AWS", "Azure", "Google Cloud", "Serverless"],
+        trending: "Edge Computing, Hybrid Cloud, Kubernetes"
+      }
+    };
+    
+    const result = techInfo[topic] || {
+      title: "Technology Overview",
+      info: "I can provide information on AI, Blockchain, Cloud Computing, and more tech topics!",
+      available_topics: Object.keys(techInfo)
+    };
+    
+    res.json(result);
+    
+  } catch (error) {
+    res.status(500).json({ error: 'Tech info service failed' });
+  }
+});
+
+// API STATUS & INFO
+app.get('/api/status', (req, res) => {
+  res.json({
+    service: "Manlung AI API",
+    version: "2.0.0",
+    status: "operational",
+    endpoints: {
+      chat: "POST /chat - Intelligent conversation",
+      voice: "POST /speak - Text-to-speech generation", 
+      music_search: "GET /search/music - Music discovery",
+      tech_info: "GET /tech/info - Technology insights"
+    },
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
   });
 });
 
