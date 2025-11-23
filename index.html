@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manlung AI - Advanced AI Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <h1>🤖 Manlung AI</h1>
+                <p>Advanced AI Assistant & Tech Guru</p>
+            </div>
+            <div class="status">
+                <span class="status-dot"></span>
+                <span id="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <!-- Main Chat Area -->
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="message ai-message">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        <strong>Manlung AI:</strong> Hello! I'm your advanced AI assistant. I can help with technology, coding, music, and much more! How can I assist you today? 🚀
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-group">
+                    <input type="text" id="userInput" placeholder="Ask me anything about tech, music, coding..." autocomplete="off">
+                    <button id="sendButton" onclick="sendMessage()">
+                        <span>Send</span>
+                        <div class="send-icon">➤</div>
+                    </button>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="toggleVoice()">
+                        <span id="voice-icon">🔇</span>
+                        <span id="voice-text">Voice Off</span>
+                    </button>
+                    <button class="action-btn" onclick="searchMusic()">
+                        <span>🎵</span>
+                        <span>Music</span>
+                    </button>
+                    <button class="action-btn" onclick="clearChat()">
+                        <span>🗑️</span>
+                        <span>Clear</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio Player -->
+        <div class="audio-player" id="audioPlayerContainer">
+            <audio id="audioPlayer" controls></audio>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
